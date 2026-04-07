@@ -1,0 +1,62 @@
+import { useState } from "react";
+import {
+  LayoutDashboard, DollarSign, Activity, UtensilsCrossed, Users,
+  Heart, Package, TrendingUp, Bell, ChevronLeft, ChevronRight
+} from "lucide-react";
+import { useAlerts } from "../../context/AlertContext";
+
+const ICON_MAP = { LayoutDashboard, DollarSign, Activity, UtensilsCrossed, Users, Heart, Package, TrendingUp, Bell };
+
+const NAV_ITEMS = [
+  { id: "command", label: "Command Centre", icon: "LayoutDashboard" },
+  { id: "revenue", label: "Revenue", icon: "DollarSign", section: "Domains" },
+  { id: "operations", label: "Operations", icon: "Activity" },
+  { id: "orders", label: "Orders & Menu", icon: "UtensilsCrossed" },
+  { id: "staff", label: "Staff", icon: "Users" },
+  { id: "customer", label: "Customer", icon: "Heart" },
+  { id: "inventory", label: "Inventory", icon: "Package" },
+  { id: "roi", label: "ROI & Growth", icon: "TrendingUp" },
+  { id: "alerts", label: "Smart Alerts", icon: "Bell", section: "System" },
+];
+
+export default function Sidebar({ activePage, onNavigate, collapsed, onToggleCollapse, mobileOpen, onCloseMobile }) {
+  const { unacknowledgedCount } = useAlerts();
+
+  return (
+    <>
+      <div className={`sidebar-overlay ${mobileOpen ? "visible" : ""}`} onClick={onCloseMobile} />
+      <nav className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
+        <div className="sidebar-brand">
+          <div className="sidebar-brand-icon">S</div>
+          <span className="sidebar-brand-text">Saffron & Sage</span>
+        </div>
+
+        <div className="sidebar-nav">
+          {NAV_ITEMS.map((item, idx) => {
+            const Icon = ICON_MAP[item.icon];
+            const showSection = item.section && !collapsed && (idx === 1 || idx === 8);
+            return (
+              <div key={item.id}>
+                {showSection && <div className="sidebar-section-title">{item.section}</div>}
+                <div
+                  className={`sidebar-nav-item ${activePage === item.id ? "active" : ""}`}
+                  onClick={() => { onNavigate(item.id); onCloseMobile(); }}
+                >
+                  <Icon size={20} className="sidebar-nav-icon" />
+                  <span className="sidebar-nav-label">{item.label}</span>
+                  {item.id === "alerts" && unacknowledgedCount > 0 && (
+                    <span className="sidebar-nav-badge">{unacknowledgedCount}</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <button className="sidebar-collapse-btn" onClick={onToggleCollapse}>
+          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+        </button>
+      </nav>
+    </>
+  );
+}
