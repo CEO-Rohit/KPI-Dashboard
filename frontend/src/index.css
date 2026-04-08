@@ -723,3 +723,41 @@ input, select { font-family: inherit; }
   transition: opacity var(--transition-base);
 }
 .sidebar-overlay.visible { display: block; opacity: 1; }
+
+/* Mobile Selectors in Sidebar */
+.mobile-selectors-section {
+  padding: var(--space-md) var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+.mobile-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+.mobile-selector-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+.mobile-selector-btn.active {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+}
+.sidebar-divider {
+  height: 1px;
+  background: var(--border-primary);
+  margin: var(--space-lg) var(--space-sm) 0;
+  opacity: 0.5;
+}
