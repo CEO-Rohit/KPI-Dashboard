@@ -149,6 +149,10 @@ server.listen(PORT, () => {
   console.log(`❤️  Health check: http://localhost:${PORT}/api/health`);
   console.log(`📡 Socket.IO enabled for real-time updates\n`);
 
+  // Auto-seed database if empty (useful for first-time production deploy)
+  const checkAndSeed = require('./db/ensure-seeded');
+  checkAndSeed().catch(err => console.error('Auto-seed failed:', err.message));
+
   // Start real-time simulation
   setupRealtimeSimulation(io);
 });
