@@ -57,7 +57,7 @@ app.get('/api/health', async (req, res) => {
     const result = await dbQuery('SELECT NOW() as time, COUNT(*) as days FROM daily_kpi_data');
     res.json({
       status: 'healthy',
-      server: 'F&B KPI Dashboard API',
+      server: 'Rasoi Master API',
       version: '1.0.0',
       database: {
         connected: true,
@@ -77,7 +77,7 @@ app.get('/api/health', async (req, res) => {
 // ─── API docs endpoint ────────────────────────────────────────
 app.get('/api', (req, res) => {
   res.json({
-    name: 'F&B KPI Dashboard API',
+    name: 'Rasoi Master API',
     version: '1.0.0',
     endpoints: {
       kpis: {

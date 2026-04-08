@@ -1,5 +1,5 @@
 export const BUSINESS_PROFILE = {
-  name: "Saffron & Sage",
+  name: "Rasoi Master",
   type: "Casual-dining restaurant with delivery channel",
   seatingCapacity: 60,
   tableCount: 18,

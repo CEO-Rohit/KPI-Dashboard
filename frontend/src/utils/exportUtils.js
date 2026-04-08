@@ -30,7 +30,7 @@ export function exportToPDF(title, columns, rows, filename = "kpi-report") {
 
   doc.setFontSize(10);
   doc.setTextColor(100);
-  doc.text(`Saffron & Sage — Generated ${new Date().toLocaleString()}`, 14, 28);
+  doc.text(`Rasoi Master — Generated ${new Date().toLocaleString()}`, 14, 28);
 
   autoTable(doc, {
     head: [columns],

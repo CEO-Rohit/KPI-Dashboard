@@ -29,7 +29,7 @@ const menuItems = [
   // PUZZLES — Low Popularity + High Margin
   { id: 22, name: "Lobster Thermidor", category: "Grill", sellPrice: 48, foodCost: 14.00, popularity: 22, quadrant: "puzzle" },
   { id: 23, name: "Duck Confit", category: "Mains", sellPrice: 36, foodCost: 10.80, popularity: 28, quadrant: "puzzle" },
-  { id: 24, name: "Saffron Seafood Paella", category: "Mains", sellPrice: 34, foodCost: 9.80, popularity: 32, quadrant: "puzzle" },
+  { id: 24, name: "Butter Chicken", category: "Mains", sellPrice: 34, foodCost: 9.80, popularity: 32, quadrant: "puzzle" },
   { id: 25, name: "Crème Brûlée", category: "Desserts", sellPrice: 14, foodCost: 3.20, popularity: 35, quadrant: "puzzle" },
   { id: 26, name: "Lamb Rack", category: "Grill", sellPrice: 42, foodCost: 12.60, popularity: 26, quadrant: "puzzle" },
   { id: 27, name: "Aged Negroni", category: "Beverages", sellPrice: 18, foodCost: 4.20, popularity: 30, quadrant: "puzzle" },

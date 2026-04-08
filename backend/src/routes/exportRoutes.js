@@ -118,7 +118,7 @@ router.get('/:domain/pdf', async (req, res) => {
     doc.fontSize(20).font('Helvetica-Bold')
       .text(`${domainName} KPI Report`, { align: 'center' });
     doc.fontSize(10).font('Helvetica')
-      .text(`Saffron & Sage — Last ${days} Days`, { align: 'center' });
+      .text(`Rasoi Master — Last ${days} Days`, { align: 'center' });
     doc.moveDown(1);
     doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, { align: 'center' });
     doc.moveDown(2);

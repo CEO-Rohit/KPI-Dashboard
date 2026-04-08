@@ -105,7 +105,7 @@ const MENU_ITEMS = [
   { name:'Tap Beer',category:'Beverages',sellPrice:7,foodCost:3.10,popularity:90,quadrant:'plowhorse'},
   { name:'Lobster Thermidor',category:'Grill',sellPrice:48,foodCost:14.00,popularity:22,quadrant:'puzzle'},
   { name:'Duck Confit',category:'Mains',sellPrice:36,foodCost:10.80,popularity:28,quadrant:'puzzle'},
-  { name:'Saffron Seafood Paella',category:'Mains',sellPrice:34,foodCost:9.80,popularity:32,quadrant:'puzzle'},
+  { name:'Butter Chicken',category:'Mains',sellPrice:34,foodCost:9.80,popularity:32,quadrant:'puzzle'},
   { name:'Crème Brûlée',category:'Desserts',sellPrice:14,foodCost:3.20,popularity:35,quadrant:'puzzle'},
   { name:'Lamb Rack',category:'Grill',sellPrice:42,foodCost:12.60,popularity:26,quadrant:'puzzle'},
   { name:'Aged Negroni',category:'Beverages',sellPrice:18,foodCost:4.20,popularity:30,quadrant:'puzzle'},

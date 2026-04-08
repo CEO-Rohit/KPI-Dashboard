@@ -21,8 +21,8 @@ export default function Sidebar({ activePage, onNavigate, collapsed, onToggleCol
       <div className={`sidebar-overlay ${mobileOpen ? "visible" : ""}`} onClick={onCloseMobile} />
       <nav className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-brand">
-          <div className="sidebar-brand-icon">S</div>
-          <span className="sidebar-brand-text">Saffron & Sage</span>
+          <div className="sidebar-brand-icon">R</div>
+          <span className="sidebar-brand-text">Rasoi Master</span>
         </div>
 
         <div className="sidebar-nav">
