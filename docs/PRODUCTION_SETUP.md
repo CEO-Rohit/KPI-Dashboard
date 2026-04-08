@@ -12,9 +12,9 @@ Since your project uses **Socket.io** and **PostgreSQL**, I recommend using [Ren
 3.  **Environment**: Select `Docker`.
 4.  **Plan**: Select the "Starter" or "Free" tier.
 5.  **Environment Variables**: Add the following:
-    -   `PORT`: `3001`
-    -   `DATABASE_URL`: Your PostgreSQL connection string (see step 2).
+    -   `DATABASE_URL`: Your PostgreSQL connection string (e.g. `postgres://...`).
     -   `NODE_ENV`: `production`
+    -   `PORT`: `3001`
 
 ---
 
@@ -34,7 +34,7 @@ Now that your backend is deployed, you need to tell your Vercel frontend where t
 1.  Go to your **Vercel Dashboard** > **Project Settings** > **Environment Variables**.
 2.  Add the following variables:
 
-| Key | Exact Value (Example) | Description |
+| Key | Value | Description |
 | :--- | :--- | :--- |
 | `VITE_API_BASE_URL` | `https://your-backend-url.onrender.com/api` | The base URL for REST API calls. |
 | `VITE_API_URL` | `https://your-backend-url.onrender.com` | The base URL for Socket.io. |
