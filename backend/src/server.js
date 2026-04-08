@@ -21,9 +21,14 @@ const app = express();
 const server = http.createServer(app);
 
 // Socket.IO setup
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://kpi-dashboard-black.vercel.app'
+];
+
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   },
@@ -31,7 +36,7 @@ const io = new SocketIOServer(server, {
 
 // ─── Middleware ────────────────────────────────────────────────
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());

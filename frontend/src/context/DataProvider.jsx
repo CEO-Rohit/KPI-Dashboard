@@ -52,7 +52,7 @@ export const DataProvider = ({ children }) => {
 
   // ─── Real-time Integration (Socket.IO) ───────────────────────
   useEffect(() => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001' : window.location.origin);
     const socket = io(API_URL, {
       withCredentials: true,
       reconnection: true,
