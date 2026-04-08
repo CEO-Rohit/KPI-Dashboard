@@ -1,15 +1,12 @@
-import KPICard from "../components/KPICard/KPICard";
-import GaugeChart from "../components/Charts/GaugeChart";
-import HeatmapChart from "../components/Charts/HeatmapChart";
-import { generateDeadSlotHeatmap, generateHourlyData } from "../data/mockDataGenerator";
+import { exportService } from "../services/api";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
-import { exportToPDF, generateDomainExportData } from "../utils/exportUtils";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
+import KPICard from "../components/KPICard/KPICard";
+import HeatmapChart from "../components/Charts/HeatmapChart";
 
-export default function Operations({ aggregated, dailyData }) {
+export default function Operations({ aggregated, dailyData, heatmaps }) {
   const o = aggregated.operations;
-  const hourlyData = generateHourlyData(dailyData);
-  const deadSlots = generateDeadSlotHeatmap(dailyData);
+  const deadSlots = heatmaps.deadslot;
 
   const hourLabels = [];
   for (let h = 11; h <= 22; h++) { hourLabels.push(`${h}:00`); hourLabels.push(`${h}:30`); }
@@ -26,14 +23,19 @@ export default function Operations({ aggregated, dailyData }) {
   }));
 
   const kttTrend = dailyData.slice(-14).map(d => ({
-    date: d.dayName + " " + d.date.slice(8),
+    date: d.dayName + " " + (d.date ? d.date.toString().slice(8) : ""),
     ktt: d.operations.ktt,
     threshold: 18,
   }));
 
-  const handleExport = () => {
-    const { columns, rows } = generateDomainExportData(aggregated, "operations");
-    exportToPDF("Operations Monitor Report", columns, rows, "operations-report");
+  const handleExportPDF = () => {
+    const url = exportService.getExportUrl("operations", "pdf", 30);
+    window.open(url, "_blank");
+  };
+
+  const handleExportCSV = () => {
+    const url = exportService.getExportUrl("operations", "csv", 30);
+    window.open(url, "_blank");
   };
 
   return (
@@ -43,7 +45,10 @@ export default function Operations({ aggregated, dailyData }) {
           <h1>Operations Monitor</h1>
           <p>Kitchen performance, table management, and service efficiency</p>
         </div>
-        <button className="export-btn" onClick={handleExport}><Download size={14} /> Export PDF</button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button className="export-btn" onClick={handleExportCSV}><FileText size={14} /> Export CSV</button>
+          <button className="export-btn" onClick={handleExportPDF}><Download size={14} /> Export PDF</button>
+        </div>
       </div>
 
       <div className="kpi-grid" style={{ marginBottom: "var(--space-xl)" }}>

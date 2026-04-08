@@ -1,30 +1,47 @@
-import KPICard from "../components/KPICard/KPICard";
+import { exportService, kpiService } from "../services/api";
 import MenuQuadrantChart from "../components/Charts/MenuQuadrantChart";
-import { getMenuItems } from "../data/menuItems";
-import { exportToPDF, exportToCSV } from "../utils/exportUtils";
-import { Download, FileText } from "lucide-react";
+import KPICard from "../components/KPICard/KPICard";
+import { Download, FileText, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function OrdersMenu({ aggregated, dailyData }) {
   const o = aggregated.orders;
-  const menuItems = getMenuItems();
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    kpiService.getMenuItems().then(res => {
+      const mapped = res.data.map(item => ({
+        ...item,
+        sellPrice: parseFloat(item.sell_price),
+        foodCost: parseFloat(item.food_cost),
+        contributionMargin: parseFloat(item.sell_price) - parseFloat(item.food_cost),
+      }));
+      setMenuItems(mapped);
+      setLoading(false);
+    });
+  }, []);
+
   const topItems = [...menuItems].sort((a, b) => b.popularity - a.popularity).slice(0, 5);
   const bottomItems = [...menuItems].sort((a, b) => a.popularity - b.popularity).slice(0, 5);
 
   const handleExportPDF = () => {
-    exportToPDF("Orders & Menu Report",
-      ["Item", "Category", "Price", "Cost", "Margin", "Popularity", "Quadrant"],
-      menuItems.map(m => [m.name, m.category, `$${m.sellPrice}`, `$${m.foodCost}`, `$${m.contributionMargin.toFixed(2)}`, `${m.popularity}%`, m.quadrant]),
-      "menu-analysis-report"
-    );
+    const url = exportService.getExportUrl("orders", "pdf", 30);
+    window.open(url, "_blank");
   };
 
   const handleExportCSV = () => {
-    exportToCSV(menuItems.map(m => ({
-      Name: m.name, Category: m.category, "Sell Price": m.sellPrice,
-      "Food Cost": m.foodCost, "Margin": m.contributionMargin.toFixed(2),
-      "Popularity %": m.popularity, Quadrant: m.quadrant,
-    })), "menu-items-export");
+    const url = exportService.getExportUrl("orders", "csv", 30);
+    window.open(url, "_blank");
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -70,7 +87,7 @@ export default function OrdersMenu({ aggregated, dailyData }) {
             <div className="chart-subtitle">Popularity vs contribution margin — position your items strategically</div>
           </div>
         </div>
-        <MenuQuadrantChart />
+        <MenuQuadrantChart menuItems={menuItems} />
       </div>
 
       <div className="section-grid section-grid-2">

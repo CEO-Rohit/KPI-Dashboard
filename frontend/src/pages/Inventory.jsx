@@ -1,14 +1,14 @@
-import KPICard from "../components/KPICard/KPICard";
+import { exportService } from "../services/api";
 import GaugeChart from "../components/Charts/GaugeChart";
+import KPICard from "../components/KPICard/KPICard";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, Line } from "recharts";
-import { exportToPDF, generateDomainExportData } from "../utils/exportUtils";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 
 export default function Inventory({ aggregated, dailyData }) {
   const inv = aggregated.inventory;
 
   const wasteTrend = dailyData.slice(-14).map(d => ({
-    date: d.dayName + " " + d.date.slice(8),
+    date: d.dayName + " " + (d.date ? d.date.toString().slice(8) : ""),
     percent: d.inventory.wastePercent,
     value: d.inventory.wasteValue,
     threshold: 5,
@@ -19,13 +19,20 @@ export default function Inventory({ aggregated, dailyData }) {
   }));
 
   const shrinkageLog = dailyData.slice(-14).filter(d => d.inventory.shrinkageRate > 1.5).map(d => ({
-    date: d.date, day: d.dayName, rate: d.inventory.shrinkageRate,
+    date: d.date ? d.date.toString().slice(0, 10) : "", 
+    day: d.dayName, 
+    rate: d.inventory.shrinkageRate,
     status: d.inventory.shrinkageRate > 2 ? "alert" : "watch",
   }));
 
-  const handleExport = () => {
-    const { columns, rows } = generateDomainExportData(aggregated, "inventory");
-    exportToPDF("Inventory & Waste Report", columns, rows, "inventory-report");
+  const handleExportPDF = () => {
+    const url = exportService.getExportUrl("inventory", "pdf", 30);
+    window.open(url, "_blank");
+  };
+
+  const handleExportCSV = () => {
+    const url = exportService.getExportUrl("inventory", "csv", 30);
+    window.open(url, "_blank");
   };
 
   return (
@@ -35,7 +42,10 @@ export default function Inventory({ aggregated, dailyData }) {
           <h1>Inventory & Waste</h1>
           <p>Food cost control, waste management, and supplier performance</p>
         </div>
-        <button className="export-btn" onClick={handleExport}><Download size={14} /> Export PDF</button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button className="export-btn" onClick={handleExportCSV}><FileText size={14} /> Export CSV</button>
+          <button className="export-btn" onClick={handleExportPDF}><Download size={14} /> Export PDF</button>
+        </div>
       </div>
 
       <div className="kpi-grid" style={{ marginBottom: "var(--space-xl)" }}>

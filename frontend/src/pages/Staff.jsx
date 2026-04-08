@@ -1,16 +1,24 @@
-import KPICard from "../components/KPICard/KPICard";
+import { exportService, kpiService } from "../services/api";
 import GaugeChart from "../components/Charts/GaugeChart";
-import { getStaffMetrics } from "../data/staffData";
+import KPICard from "../components/KPICard/KPICard";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
-import { exportToPDF, generateDomainExportData } from "../utils/exportUtils";
-import { Download } from "lucide-react";
+import { Download, Loader2, FileText } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function Staff({ aggregated, dailyData }) {
   const s = aggregated.staff;
-  const metrics = getStaffMetrics();
+  const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    kpiService.getStaffData().then(res => {
+      setMetrics(res.data.metrics);
+      setLoading(false);
+    });
+  }, []);
 
   const labourTrend = dailyData.slice(-14).map(d => ({
-    date: d.dayName + " " + d.date.slice(8),
+    date: d.dayName + " " + (d.date ? d.date.toString().slice(8) : ""),
     cost: d.staff.labourCostPct,
     threshold: 35,
   }));
@@ -20,13 +28,29 @@ export default function Staff({ aggregated, dailyData }) {
   }));
 
   const noShowLog = dailyData.slice(-14).filter(d => d.staff.noShows > 0).map(d => ({
-    date: d.date, day: d.dayName, noShows: d.staff.noShows, late: d.staff.lateArrivals,
+    date: d.date ? d.date.toString().slice(0, 10) : "", 
+    day: d.dayName, 
+    noShows: d.staff.noShows, 
+    late: d.staff.lateArrivals,
   }));
 
-  const handleExport = () => {
-    const { columns, rows } = generateDomainExportData(aggregated, "staff");
-    exportToPDF("Staff Performance Report", columns, rows, "staff-report");
+  const handleExportPDF = () => {
+    const url = exportService.getExportUrl("staff", "pdf", 30);
+    window.open(url, "_blank");
   };
+
+  const handleExportCSV = () => {
+    const url = exportService.getExportUrl("staff", "csv", 30);
+    window.open(url, "_blank");
+  };
+
+  if (loading || !metrics) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -35,7 +59,10 @@ export default function Staff({ aggregated, dailyData }) {
           <h1>Staff Performance</h1>
           <p>Labour cost efficiency, productivity, and attendance tracking</p>
         </div>
-        <button className="export-btn" onClick={handleExport}><Download size={14} /> Export PDF</button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button className="export-btn" onClick={handleExportCSV}><FileText size={14} /> Export CSV</button>
+          <button className="export-btn" onClick={handleExportPDF}><Download size={14} /> Export PDF</button>
+        </div>
       </div>
 
       <div className="kpi-grid" style={{ marginBottom: "var(--space-xl)" }}>

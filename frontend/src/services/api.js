@@ -25,45 +25,45 @@ export const kpiService = {
    * @param {string} domain - optional domain name
    * @param {string} range - 'today', 'week', 'month'
    */
-  getAggregatedData: (domain = 'all', range = 'today') => 
+  getAggregatedData: (domain = 'all', range = 'today') =>
     api.get(`/kpis/${domain}`, { params: { range } }),
 
   /**
    * Get raw daily records for a time period
    * @param {number} days - number of days to look back
    */
-  getDailyData: (days = 30) => 
+  getDailyData: (days = 30) =>
     api.get('/daily', { params: { days } }),
 
   /**
    * Get trend data for charts
    * @param {number} days - number of days
    */
-  getTrends: (days = 30) => 
+  getTrends: (days = 30) =>
     api.get('/trends', { params: { days } }),
 
   /**
    * Get today's hourly performance
    */
-  getHourlyData: () => 
+  getHourlyData: () =>
     api.get('/hourly'),
 
   /**
    * Get 7-day heatmaps
    */
-  getHeatmaps: (type = 'revpash') => 
+  getHeatmaps: (type = 'revpash') =>
     api.get(`/heatmaps/${type}`),
 
   /**
    * Get menu engineering data
    */
-  getMenuItems: () => 
+  getMenuItems: () =>
     api.get('/menu'),
 
   /**
    * Get staff members & performance metrics
    */
-  getStaffData: () => 
+  getStaffData: () =>
     api.get('/staff'),
 };
 
@@ -71,31 +71,31 @@ export const alertService = {
   /**
    * List all alerts
    */
-  getAlerts: (filters = {}) => 
+  getAlerts: (filters = {}) =>
     api.get('/alerts', { params: filters }),
 
   /**
    * Acknowledge an alert
    */
-  acknowledge: (id) => 
+  acknowledge: (id) =>
     api.put(`/alerts/${id}/acknowledge`),
 
   /**
    * Dismiss an alert
    */
-  dismiss: (id) => 
+  dismiss: (id) =>
     api.put(`/alerts/${id}/dismiss`),
 
   /**
    * Trigger a demo scenario
    */
-  triggerScenario: (scenarioId) => 
+  triggerScenario: (scenarioId) =>
     api.post('/alerts/trigger', { scenarioId }),
 
   /**
    * Reset a scenario
    */
-  resetScenario: (scenarioId) => 
+  resetScenario: (scenarioId) =>
     api.post('/alerts/reset-scenario', { scenarioId }),
 };
 
@@ -103,19 +103,19 @@ export const settingsService = {
   /**
    * Get alert thresholds
    */
-  getThresholds: () => 
+  getThresholds: () =>
     api.get('/settings/thresholds'),
 
   /**
    * Update a threshold
    */
-  updateThreshold: (id, data) => 
+  updateThreshold: (id, data) =>
     api.put(`/settings/thresholds/${id}`, data),
 
   /**
    * Bulk update thresholds
    */
-  bulkUpdateThresholds: (thresholds) => 
+  bulkUpdateThresholds: (thresholds) =>
     api.put('/settings/thresholds', { thresholds }),
 };
 
@@ -123,7 +123,7 @@ export const exportService = {
   /**
    * Download a domain report as CSV or PDF
    */
-  getExportUrl: (domain, format, days = 30) => 
+  getExportUrl: (domain, format, days = 30) =>
     `${API_BASE_URL}/export/${domain}/${format}?days=${days}`,
 };
 

@@ -1,14 +1,13 @@
+import { exportService } from "../services/api";
+import { Download, FileText } from "lucide-react";
 import KPICard from "../components/KPICard/KPICard";
 import RevenueChart from "../components/Charts/RevenueChart";
 import ChannelMixChart from "../components/Charts/ChannelMixChart";
 import HeatmapChart from "../components/Charts/HeatmapChart";
-import { generateRevPASHHeatmap } from "../data/mockDataGenerator";
-import { exportToPDF, generateDomainExportData } from "../utils/exportUtils";
-import { Download } from "lucide-react";
 
-export default function Revenue({ aggregated, dailyData }) {
+export default function Revenue({ aggregated, dailyData, heatmaps }) {
   const r = aggregated.revenue;
-  const heatmapRaw = generateRevPASHHeatmap(dailyData);
+  const heatmapRaw = heatmaps.revpash;
   const hourLabels = Array.from({ length: 12 }, (_, i) => `${i + 11}:00`);
   const dayLabels = heatmapRaw.map(d => d.day);
   const heatmapData = [];
@@ -18,9 +17,14 @@ export default function Revenue({ aggregated, dailyData }) {
     });
   });
 
-  const handleExport = () => {
-    const { columns, rows } = generateDomainExportData(aggregated, "revenue");
-    exportToPDF("Revenue Intelligence Report", columns, rows, "revenue-report");
+  const handleExportPDF = () => {
+    const url = exportService.getExportUrl("revenue", "pdf", 30);
+    window.open(url, "_blank");
+  };
+
+  const handleExportCSV = () => {
+    const url = exportService.getExportUrl("revenue", "csv", 30);
+    window.open(url, "_blank");
   };
 
   return (
@@ -30,7 +34,10 @@ export default function Revenue({ aggregated, dailyData }) {
           <h1>Revenue Intelligence</h1>
           <p>Track revenue performance, channel mix, and peak hour capture</p>
         </div>
-        <button className="export-btn" onClick={handleExport}><Download size={14} /> Export PDF</button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button className="export-btn" onClick={handleExportCSV}><FileText size={14} /> Export CSV</button>
+          <button className="export-btn" onClick={handleExportPDF}><Download size={14} /> Export PDF</button>
+        </div>
       </div>
 
       <div className="kpi-grid" style={{ marginBottom: "var(--space-xl)" }}>

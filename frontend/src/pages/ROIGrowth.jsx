@@ -1,21 +1,21 @@
+import { exportService } from "../services/api";
+import { Download, FileText } from "lucide-react";
 import KPICard from "../components/KPICard/KPICard";
 import GaugeChart from "../components/Charts/GaugeChart";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
-import { exportToPDF, generateDomainExportData } from "../utils/exportUtils";
-import { Download } from "lucide-react";
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function ROIGrowth({ aggregated, dailyData }) {
   const roi = aggregated.roi;
   const r = aggregated.revenue;
 
   const ebitdaTrend = dailyData.slice(-30).map(d => ({
-    date: d.date.slice(5),
+    date: d.date ? d.date.toString().slice(5, 10) : "",
     ebitda: d.roi.ebitda,
     margin: d.roi.ebitdaMargin,
   }));
 
   const primeCostTrend = dailyData.slice(-14).map(d => ({
-    date: d.dayName + " " + d.date.slice(8),
+    date: d.dayName + " " + (d.date ? d.date.toString().slice(8) : ""),
     cost: d.roi.primeCost,
     target: 60,
   }));
@@ -26,9 +26,14 @@ export default function ROIGrowth({ aggregated, dailyData }) {
     { channel: "Local Ads", roi: roi.marketingRoi.local, spend: 600 },
   ];
 
-  const handleExport = () => {
-    const { columns, rows } = generateDomainExportData(aggregated, "roi");
-    exportToPDF("ROI & Growth Report", columns, rows, "roi-report");
+  const handleExportPDF = () => {
+    const url = exportService.getExportUrl("roi", "pdf", 30);
+    window.open(url, "_blank");
+  };
+
+  const handleExportCSV = () => {
+    const url = exportService.getExportUrl("roi", "csv", 30);
+    window.open(url, "_blank");
   };
 
   return (
@@ -38,7 +43,10 @@ export default function ROIGrowth({ aggregated, dailyData }) {
           <h1>ROI & Growth</h1>
           <p>Financial health, profitability, and growth levers</p>
         </div>
-        <button className="export-btn" onClick={handleExport}><Download size={14} /> Export PDF</button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button className="export-btn" onClick={handleExportCSV}><FileText size={14} /> Export CSV</button>
+          <button className="export-btn" onClick={handleExportPDF}><Download size={14} /> Export PDF</button>
+        </div>
       </div>
 
       <div className="kpi-grid" style={{ marginBottom: "var(--space-xl)" }}>

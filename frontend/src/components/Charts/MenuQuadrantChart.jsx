@@ -1,13 +1,20 @@
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from "recharts";
-import { getQuadrantData } from "../../data/menuItems";
 
 const QUADRANT_COLORS = { star: "#10b981", plowhorse: "#6366f1", puzzle: "#f59e0b", dog: "#ef4444" };
 const QUADRANT_LABELS = { star: "Stars ★", plowhorse: "Plowhorses 🐴", puzzle: "Puzzles 🧩", dog: "Dogs 🐕" };
 
-export default function MenuQuadrantChart() {
-  const data = getQuadrantData();
-  const avgPopularity = data.reduce((s, d) => s + d.x, 0) / data.length;
-  const avgMargin = data.reduce((s, d) => s + d.y, 0) / data.length;
+export default function MenuQuadrantChart({ menuItems = [] }) {
+  const data = menuItems.map(item => ({
+    name: item.name,
+    x: item.popularity,
+    y: item.contributionMargin,
+    quadrant: item.quadrant,
+    category: item.category,
+    sellPrice: item.sellPrice,
+    foodCost: item.foodCost,
+  }));
+  const avgPopularity = data.length ? data.reduce((s, d) => s + d.x, 0) / data.length : 0;
+  const avgMargin = data.length ? data.reduce((s, d) => s + d.y, 0) / data.length : 0;
 
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload?.[0]) return null;
