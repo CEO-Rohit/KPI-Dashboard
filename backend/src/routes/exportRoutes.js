@@ -108,69 +108,100 @@ router.get('/:domain/pdf', async (req, res) => {
     const rows = result.rows.reverse();
 
     // Create PDF
-    const doc = new PDFDocument({ margin: 40, size: 'A4', layout: 'landscape' });
+    const PDFTable = require('pdfkit-table');
+    const doc = new PDFTable({ margin: 30, size: 'A4', layout: 'landscape' });
     
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${domain}_kpi_report_${days}d.pdf"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${domain}_report_${new Date().toISOString().split('T')[0]}.pdf"`);
     doc.pipe(res);
 
-    // Title
-    doc.fontSize(20).font('Helvetica-Bold')
-      .text(`${domainName} KPI Report`, { align: 'center' });
+    // ─── Header Section ──────────────────────────────────────────
+    doc.rect(0, 0, doc.page.width, 60).fill('#1e293b');
+    doc.fillColor('#ffffff').fontSize(22).font('Helvetica-Bold')
+       .text('Rasoi Master Intelligence', 40, 20);
     doc.fontSize(10).font('Helvetica')
-      .text(`Rasoi Master — Last ${days} Days`, { align: 'center' });
-    doc.moveDown(1);
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, { align: 'center' });
-    doc.moveDown(2);
+       .text(`KPI Performance Report: ${domainName}`, 320, 25, { align: 'right', width: doc.page.width - 360 });
+    doc.fontSize(8).text(`Generated: ${new Date().toLocaleString()}`, 320, 38, { align: 'right', width: doc.page.width - 360 });
 
-    // Summary statistics
+    doc.fillColor('#334155').moveDown(4);
+
+    // ─── Summary Analytics (Stats Grid) ──────────────────────────
     if (rows.length > 0) {
-      doc.fontSize(14).font('Helvetica-Bold').text('Summary');
+      doc.fontSize(14).font('Helvetica-Bold').text('Executive Summary (Last 30 Days)', 40);
       doc.moveDown(0.5);
-      doc.fontSize(9).font('Helvetica');
 
       const numCols = config.columns.filter(c => c !== 'date' && c !== 'day_name');
-      numCols.forEach(col => {
+      let currentX = 40;
+      let currentY = doc.y;
+      const boxWidth = 145;
+      const boxHeight = 45;
+
+      numCols.forEach((col, idx) => {
+        // Line wrap after 5 boxes
+        if (idx > 0 && idx % 5 === 0) {
+          currentX = 40;
+          currentY += boxHeight + 10;
+        }
+
         const values = rows.map(r => parseFloat(r[col]) || 0);
         const avg = values.reduce((s, v) => s + v, 0) / values.length;
-        const min = Math.min(...values);
-        const max = Math.max(...values);
         const header = config.headers[config.columns.indexOf(col)];
-        doc.text(`${header}: Avg ${avg.toFixed(1)} | Min ${min.toFixed(1)} | Max ${max.toFixed(1)}`);
+
+        // Draw box
+        doc.rect(currentX, currentY, boxWidth, boxHeight).fill('#f8fafc').stroke('#e2e8f0');
+        doc.fillColor('#64748b').fontSize(7).text(header.toUpperCase(), currentX + 5, currentY + 8, { width: boxWidth - 10 });
+        doc.fillColor('#1e293b').fontSize(14).font('Helvetica-Bold').text(avg.toFixed(1), currentX + 5, currentY + 20);
+        
+        currentX += boxWidth + 10;
       });
-      doc.moveDown(1);
+
+      doc.y = currentY + boxHeight + 20;
     }
 
-    // Data Table (show last 15 rows to fit on page)
-    doc.fontSize(14).font('Helvetica-Bold').text('Daily Data');
+    // ─── Detailed Data Table ─────────────────────────────────────
+    doc.fillColor('#1e293b').fontSize(14).font('Helvetica-Bold').text('Daily Performance Log', 40);
     doc.moveDown(0.5);
 
-    const tableData = rows.slice(-15);
-    const colWidth = (doc.page.width - 80) / Math.min(config.headers.length, 8);
-    const displayCols = config.headers.slice(0, 8);
+    // Prepare table data
+    const tableData = {
+      title: "",
+      headers: config.headers,
+      rows: rows.map(row => 
+        config.columns.map(col => {
+          let val = row[col];
+          if (val instanceof Date) return val.toISOString().split('T')[0];
+          return isNaN(val) ? val : parseFloat(val).toFixed(1);
+        })
+      ),
+    };
 
-    // Header row
-    doc.fontSize(7).font('Helvetica-Bold');
-    let x = 40;
-    displayCols.forEach(header => {
-      doc.text(header, x, doc.y, { width: colWidth, continued: false });
-      x += colWidth;
+    // Table styling
+    await doc.table(tableData, {
+      x: 40,
+      prepareHeader: () => doc.font('Helvetica-Bold').fontSize(8).fillColor('#1e293b'),
+      prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+        doc.font('Helvetica').fontSize(8).fillColor('#334155');
+        // Zebra striping
+        if (indexRow % 2 === 0) {
+          doc.rect(rectRow.x, rectRow.y, rectRow.width, rectRow.height).fill('#f1f5f9');
+          // Re-draw text because fill covers it
+          doc.fillColor('#334155');
+        }
+      },
+      columnsSize: config.columns.map(() => (doc.page.width - 80) / config.columns.length)
     });
-    doc.moveDown(0.5);
 
-    // Data rows
-    doc.font('Helvetica').fontSize(7);
-    tableData.forEach(row => {
-      x = 40;
-      const y = doc.y;
-      config.columns.slice(0, 8).forEach(col => {
-        let val = row[col];
-        if (val instanceof Date) val = val.toISOString().split('T')[0];
-        doc.text(String(val), x, y, { width: colWidth });
-        x += colWidth;
-      });
-      doc.moveDown(0.3);
-    });
+    // ─── Footer ──────────────────────────────────────────────────
+    const range = doc.bufferedPageRange();
+    for (let i = range.start; i < range.start + range.count; i++) {
+      doc.switchToPage(i);
+      doc.fontSize(8).fillColor('#94a3b8').text(
+        `Page ${i + 1} of ${range.count} — Rasoi Master Intelligence Engine`,
+        40, 
+        doc.page.height - 40,
+        { align: 'center' }
+      );
+    }
 
     doc.end();
   } catch (err) {
