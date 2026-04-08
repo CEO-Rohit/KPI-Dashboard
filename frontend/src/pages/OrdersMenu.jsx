@@ -51,8 +51,8 @@ export default function OrdersMenu({ aggregated, dailyData }) {
           <p>Menu engineering, order quality, and upsell performance</p>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
-          <button className="export-btn" onClick={handleExportCSV}><FileText size={14} /> CSV</button>
-          <button className="export-btn" onClick={handleExportPDF}><Download size={14} /> PDF</button>
+          <button className="export-btn" onClick={handleExportCSV}><FileText size={14} />Export CSV</button>
+          <button className="export-btn" onClick={handleExportPDF}><Download size={14} />Export PDF</button>
         </div>
       </div>
 
