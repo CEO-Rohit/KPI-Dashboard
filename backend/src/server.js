@@ -6,6 +6,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
+const morgan = require('morgan');
 const { Server: SocketIOServer } = require('socket.io');
 
 // Routes
@@ -35,24 +36,13 @@ const io = new SocketIOServer(server, {
 });
 
 // ─── Middleware ────────────────────────────────────────────────
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// ─── Request logging ──────────────────────────────────────────
-app.use((req, res, next) => {
-  const start = Date.now();
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    if (duration > 200) {
-      console.log(`${req.method} ${req.originalUrl} — ${res.statusCode} (${duration}ms)`);
-    }
-  });
-  next();
-});
 
 // ─── API Routes ───────────────────────────────────────────────
 app.use('/api', kpiRoutes);
@@ -144,10 +134,10 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3001;
 
 server.listen(PORT, () => {
-  console.log(`\n🚀 F&B KPI Dashboard API running on http://localhost:${PORT}`);
-  console.log(`📋 API documentation: http://localhost:${PORT}/api`);
-  console.log(`❤️  Health check: http://localhost:${PORT}/api/health`);
-  console.log(`📡 Socket.IO enabled for real-time updates\n`);
+  console.log(`\n F&B KPI Dashboard API running on http://localhost:${PORT}`);
+  console.log(` API documentation: http://localhost:${PORT}/api`);
+  console.log(`  Health check: http://localhost:${PORT}/api/health`);
+  console.log(` Socket.IO enabled for real-time updates\n`);
 
   // Auto-seed database if empty (useful for first-time production deploy)
   const checkAndSeed = require('./db/ensure-seeded');
@@ -159,13 +149,24 @@ server.listen(PORT, () => {
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
-  console.log('\n👋 Shutting down gracefully...');
+  console.log('\n👋 SIGTERM received. Shutting down gracefully...');
   const { stopSimulation } = require('./realtime/simulation');
   stopSimulation();
+  
   server.close(() => {
+    console.log('HTTP server closed.');
     const { pool } = require('./db/database');
-    pool.end().then(() => process.exit(0));
+    pool.end().then(() => {
+      console.log('Database pool closed. Exit.');
+      process.exit(0);
+    });
   });
+
+  // Force close after 10s if graceful shutdown fails
+  setTimeout(() => {
+    console.error('Could not close connections in time, forcefully shutting down');
+    process.exit(1);
+  }, 10000);
 });
 
 module.exports = { app, server, io };

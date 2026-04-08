@@ -39,8 +39,15 @@ export const DataProvider = ({ children }) => {
         deadslot: deadslotRes.data,
       });
     } catch (err) {
-      setError(err.message);
-      toast.error(`Failed to fetch dashboard data: ${err.message}`);
+      // Standardize error message for UI display
+      const errorMsg = err.message?.includes('filter') 
+        ? "Received invalid data from backend. Please refresh the page."
+        : err.message || "Failed to connect to the backend engine.";
+      
+      console.error("DataProvider Error:", err);
+      setError(errorMsg);
+      setLoading(false);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

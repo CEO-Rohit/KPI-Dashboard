@@ -113,4 +113,12 @@ We have successfully implemented the vast majority of the required 49 KPIs. Belo
 38. Loyalty Programme ROI ("Loyalty ROI")
 39. Delivery Platform Commission Impact ("Delivery Commission")
 
+## Production Deployment
+
+This project is configured for cloud deployment:
+- **Frontend**: Hosted on **Vercel** with environment variable support for dynamic API endpoints.
+- **Backend**: Containerized with **Docker** and deployed as a Web Service on **Render**.
+- **Database**: Persistent **PostgreSQL** instance with automatic seeding on first startup to ensure the dashboard is always data-rich.
+- **Security**: Supports `DATABASE_URL` with SSL enforcement for secure cloud database connections.
+
 *(Note: Data for advanced dimensional KPIs like the Dead Slot Identification Index or Menu Contribution Margins are visualized directly within the heatmap and scatter charts respectively rather than strictly as single-value cards.)*
